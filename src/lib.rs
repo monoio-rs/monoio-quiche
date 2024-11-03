@@ -1,13 +1,12 @@
-#![feature(type_alias_impl_trait)]
-
 mod connection;
 mod error;
 mod h3;
+mod macros;
 
 // re-export quiche
 pub use connection::Connection;
 pub use error::{Error, Result};
-pub use h3::H3Connction;
+pub use h3::H3Connection;
 pub use quiche;
 
 mod prelude {

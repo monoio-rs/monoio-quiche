@@ -11,7 +11,7 @@ use local_sync::oneshot;
 use monoio::{buf::IoBuf, io::Canceller, macros::support::poll_fn, net::udp::UdpSocket};
 use quiche::ConnectionId;
 
-use crate::{prelude::*, H3Connction};
+use crate::{prelude::*, H3Connection};
 
 pub struct Connection {
     io: Rc<UdpSocket>,
@@ -105,8 +105,8 @@ impl Connection {
             if let Some(timeout) = conn.timeout() {
                 let recv = socket.cancelable_recv_from(buffer, canceller.handle());
                 let sleep = monoio::time::sleep(timeout);
-                monoio::pin!(recv);
-                monoio::pin!(sleep);
+                crate::pin!(recv);
+                crate::pin!(sleep);
                 monoio::select! {
                     _ = &mut sleep => {
                         canceller = canceller.cancel();
@@ -144,8 +144,8 @@ impl Connection {
         }
     }
 
-    pub fn h3(&self, config: &QuicheH3Config) -> crate::Result<H3Connction> {
-        H3Connction::new_with_transport(
+    pub fn h3(&self, config: &QuicheH3Config) -> crate::Result<H3Connection> {
+        H3Connection::new_with_transport(
             self.io.clone(),
             self.session.clone(),
             self.h3_io.clone(),
@@ -277,15 +277,15 @@ impl Connection {
         let mut buffer = Box::new([0; MAX_DATAGRAM_SIZE]);
         let mut canceller = Canceller::new();
         let exit = notified.closed();
-        monoio::pin!(exit);
+        crate::pin!(exit);
 
         loop {
             let timeout = session.borrow().timeout();
             let (len, from) = if let Some(timeout) = timeout {
                 let recv = socket.cancelable_recv_from(buffer, canceller.handle());
                 let sleep = monoio::time::sleep(timeout);
-                monoio::pin!(recv);
-                monoio::pin!(sleep);
+                crate::pin!(recv);
+                crate::pin!(sleep);
                 monoio::select! {
                     (res, buf) = &mut recv => {
                         buffer = buf;

@@ -5,7 +5,7 @@ use quiche::h3::Event;
 
 use crate::{connection::write_io, prelude::*};
 
-pub struct H3Connction {
+pub struct H3Connection {
     io: Rc<UdpSocket>,
     session: Rc<RefCell<QuicheConnection>>,
 
@@ -15,7 +15,7 @@ pub struct H3Connction {
     h3: QuicheH3Connection,
 }
 
-impl H3Connction {
+impl H3Connection {
     pub fn new_with_transport(
         io: Rc<UdpSocket>,
         session: Rc<RefCell<QuicheConnection>>,
@@ -83,13 +83,10 @@ impl H3Connction {
     }
 }
 
-impl Stream for H3Connction {
+impl Stream for H3Connection {
     type Item = crate::Result<(u64, Event)>;
-    type NextFuture<'a> = impl Future<Output = Option<Self::Item>> + 'a
-    where
-        Self: 'a;
 
-    fn next(&mut self) -> Self::NextFuture<'_> {
+    fn next(&mut self) -> impl Future<Output = Option<Self::Item>> {
         async {
             loop {
                 // wait h3_io ready
