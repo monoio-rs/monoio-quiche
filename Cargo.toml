@@ -8,7 +8,7 @@ license = "MIT/Apache-2.0"
 name = "monoio-quiche"
 readme = "README.md"
 repository = "https://github.com/monoio-rs/monoio-quiche"
-version = "0.0.1"
+version = "0.0.2"
 
 [dependencies]
 monoio = "0.2.4"
